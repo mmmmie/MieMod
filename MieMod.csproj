@@ -25,7 +25,7 @@
         <!-- Diasble architecture mismatch warning; mods are ideally built for all platforms (MSIL)
              while your local StS2 version will be for your specific platform. -->
         <NoWarn>$(NoWarn);MSB3270</NoWarn>
-        <ModDllDeploySource>$(MSBuildProjectDirectory)/.godot/mono/temp/bin/Release/$(MSBuildProjectName).dll</ModDllDeploySource>
+        <ModDllDeploySource>$(MSBuildProjectDirectory)/.godot/mono/temp/bin/$(Configuration)/$(MSBuildProjectName).dll</ModDllDeploySource>
     </PropertyGroup>
 
     <ItemGroup Condition="Exists('$(Sts2DataDir)')">
