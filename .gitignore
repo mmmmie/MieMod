@@ -1,0 +1,28 @@
+# Godot
+.godot/
+/android/
+
+# Godot export/build artifacts
+*.pck
+*.apk
+*.aab
+*.ipa
+*.xcarchive
+
+# .NET / MSBuild
+bin/
+obj/
+.mono/
+
+# IDEs
+.idea/
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userprefs
+*.DotSettings.user
+
+# OS files
+.DS_Store
+Thumbs.db
