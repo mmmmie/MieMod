@@ -4,8 +4,10 @@ using MegaCrit.Sts2.addons.mega_text;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
 using MegaCrit.Sts2.Core.Nodes.Screens.PauseMenu;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace MieMod.QuickRestart;
 
@@ -17,6 +19,12 @@ static class QuickRestartPatch
 
     static void Postfix(NPauseMenu __instance)
     {
+        if (RunManager.Instance.NetService.Type == NetGameType.Client)
+        {
+            Log.Info("[MIEMOD]: Quick Restart: client run detected, skipping button addition.");
+            return;
+        }
+
         var buttonContainer = __instance.GetNodeOrNull<VBoxContainer>("PanelContainer/ButtonContainer");
         if (buttonContainer == null)
         {
