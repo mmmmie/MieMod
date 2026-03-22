@@ -2,6 +2,7 @@ using System.Reflection;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
 using MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect;
 using MegaCrit.Sts2.Core.Nodes.Screens.CustomRun;
@@ -44,5 +45,6 @@ static class AutoReadyPatch
 
 
         confirm.EmitSignal(NClickableControl.SignalName.Released, confirm);
+        NModalContainer.Instance?.Clear();
     }
 }
