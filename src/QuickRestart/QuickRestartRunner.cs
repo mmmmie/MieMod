@@ -19,6 +19,7 @@ using MegaCrit.Sts2.Core.Platform;
 using MegaCrit.Sts2.Core.Platform.Steam;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using MieMod.QuickRestart.Multiplayer;
 
 namespace MieMod.QuickRestart;
 
@@ -85,6 +86,25 @@ static class QuickRestartRunner
     {
         var game = NGame.Instance ??
                    throw new InvalidOperationException("[MIEMOD]: NGame.Instance was null during quick restart.");
+
+        var netService = RunManager.Instance.NetService;
+        if (netService is { IsConnected: true })
+        {
+            ulong lobbyId = 0;
+            var rawLobbyId = netService.GetRawLobbyIdentifier();
+            if (!string.IsNullOrEmpty(rawLobbyId) && !ulong.TryParse(rawLobbyId, out lobbyId))
+            {
+                Log.Warn($"[MIEMOD]: Failed to parse lobby id from '{rawLobbyId}', defaulting to 0.");
+            }
+
+            netService.SendMessage(new QuickRestartMessage { lobbyId = lobbyId });
+            Log.Info($"[MIEMOD]: Sent QuickRestartMessage before cleanup. lobbyId={lobbyId}");
+        }
+        else
+        {
+            Log.Warn("[MIEMOD]: Net service not connected before cleanup, skipping QuickRestartMessage.");
+        }
+
         await game.Transition.FadeOut(0.3f);
         RunManager.Instance.CleanUp();
         await WaitForPendingSave();
@@ -109,6 +129,7 @@ static class QuickRestartRunner
             return;
         }
 
+        QuickRestartState.SetAutoReady(true);
         multiplayerSubmenu.StartHost(readSaveResult.SaveData);
     }
 
