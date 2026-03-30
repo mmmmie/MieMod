@@ -25,14 +25,22 @@ namespace QuickReload;
 
 static class QuickReloadRunner
 {
-    public static async Task RestartAsync(NPauseMenu pauseMenu)
+    public static Task RestartAsync()
+    {
+        return RestartAsync(null);
+    }
+
+    public static async Task RestartAsync(NPauseMenu? pauseMenu)
     {
         if (RunManager.Instance.IsSinglePlayerOrFakeMultiplayer)
         {
             Log.Info("[QUICKRELOAD]: Single player run detected, restarting.");
-            DisablePauseMenuButtons(pauseMenu);
+            if (pauseMenu != null)
+            {
+                DisablePauseMenuButtons(pauseMenu);
+            }
             bool ret = await RestartSinglePlayer();
-            if (ret)
+            if (ret && pauseMenu != null)
             {
                 Log.Warn("[QUICKRELOAD]: RestartSinglePlayer returned early with ret=true, enabling pause menu buttons.");
                 EnablePauseMenuButtons(pauseMenu);
@@ -41,9 +49,12 @@ static class QuickReloadRunner
         else
         {
             Log.Info("[QUICKRELOAD]: Multiplayer run detected, restarting.");
-            DisablePauseMenuButtons(pauseMenu);
+            if (pauseMenu != null)
+            {
+                DisablePauseMenuButtons(pauseMenu);
+            }
             bool ret = await RestartMultiPlayer();
-            if (ret)
+            if (ret && pauseMenu != null)
             {
                 Log.Warn("[QUICKRELOAD]: RestartMultiPlayer returned early with ret=true, enabling pause menu buttons.");
                 EnablePauseMenuButtons(pauseMenu);
@@ -97,6 +108,7 @@ static class QuickReloadRunner
     {
         var game = NGame.Instance ??
                    throw new InvalidOperationException("[QUICKRELOAD]: NGame.Instance was null during quick restart.");
+        QuickReloadState.SetPendingVisualRecovery();
 
         var netService = RunManager.Instance.NetService;
         if (netService is { IsConnected: true })
@@ -131,6 +143,7 @@ static class QuickReloadRunner
         if (!readSaveResult.Success || readSaveResult.SaveData == null)
         {
             Log.Warn("[QUICKRELOAD]: Broken multiplayer run save detected, big problem");
+            QuickReloadState.ClearPendingVisualRecovery();
             return true;
         }
 
