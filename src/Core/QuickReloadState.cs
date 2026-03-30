@@ -7,6 +7,7 @@ internal static class QuickReloadState
     private static bool _pendingRestart;
     private static ulong _pendingPlayerId;
     private static bool _pendingAutoReady;
+    private static bool _pendingVisualRecovery;
 
     public static void SetPendingRestart(ulong playerId)
     {
@@ -65,6 +66,36 @@ internal static class QuickReloadState
             _pendingRestart = false;
             _pendingPlayerId = 0;
             _pendingAutoReady = false;
+        }
+    }
+
+    public static void SetPendingVisualRecovery()
+    {
+        lock (Sync)
+        {
+            _pendingVisualRecovery = true;
+        }
+    }
+
+    public static bool TryConsumePendingVisualRecovery()
+    {
+        lock (Sync)
+        {
+            if (!_pendingVisualRecovery)
+            {
+                return false;
+            }
+
+            _pendingVisualRecovery = false;
+            return true;
+        }
+    }
+
+    public static void ClearPendingVisualRecovery()
+    {
+        lock (Sync)
+        {
+            _pendingVisualRecovery = false;
         }
     }
 }
