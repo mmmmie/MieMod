@@ -30,6 +30,18 @@ static class GameplayHotkeyPatch
         }
         _f5WasPressed = true;
 
+        if (NGame.Instance?.Transition?.InTransition == true)
+        {
+            Log.Info("[QUICKRELOAD]: Ignoring F5 quick reload while a transition is in progress.");
+            return;
+        }
+
+        if (QuickReloadState.IsRunStartupNetGuardActive())
+        {
+            Log.Info("[QUICKRELOAD]: Ignoring F5 quick reload while startup net guard is active.");
+            return;
+        }
+
         if (RunManager.Instance.NetService.Type == NetGameType.Client)
         {
             Log.Info("[QUICKRELOAD]: Ignoring F5 quick reload on client.");

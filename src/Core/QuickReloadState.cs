@@ -7,6 +7,8 @@ internal static class QuickReloadState
     private static bool _pendingRestart;
     private static ulong _pendingPlayerId;
     private static bool _pendingAutoReady;
+    private static bool _pendingRunStartupNetGuard;
+    private static bool _runStartupNetGuardActive;
 
     public static void SetPendingRestart(ulong playerId)
     {
@@ -65,6 +67,55 @@ internal static class QuickReloadState
             _pendingRestart = false;
             _pendingPlayerId = 0;
             _pendingAutoReady = false;
+        }
+    }
+
+    public static void ResetRunStartupNetGuard()
+    {
+        lock (Sync)
+        {
+            _pendingRunStartupNetGuard = false;
+            _runStartupNetGuardActive = false;
+        }
+    }
+
+    public static void MarkPendingRunStartupNetGuard()
+    {
+        lock (Sync)
+        {
+            _pendingRunStartupNetGuard = true;
+        }
+    }
+
+    public static bool TryArmRunStartupNetGuard()
+    {
+        lock (Sync)
+        {
+            if (!_pendingRunStartupNetGuard)
+            {
+                return false;
+            }
+
+            _pendingRunStartupNetGuard = false;
+            _runStartupNetGuardActive = true;
+            return true;
+        }
+    }
+
+    public static bool IsRunStartupNetGuardActive()
+    {
+        lock (Sync)
+        {
+            return _runStartupNetGuardActive;
+        }
+    }
+
+    public static void ClearRunStartupNetGuard()
+    {
+        lock (Sync)
+        {
+            _pendingRunStartupNetGuard = false;
+            _runStartupNetGuardActive = false;
         }
     }
 }

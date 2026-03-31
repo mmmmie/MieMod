@@ -1,5 +1,5 @@
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Helpers;
@@ -32,6 +32,8 @@ static class AutoReadyPatch
             return;
         }
 
+        QuickReloadState.ResetRunStartupNetGuard();
+
         if (__instance is not Node node)
         {
             Log.Warn("[QUICKRELOAD]: AutoReady postfix called, but instance is not a Godot.Node.");
@@ -57,21 +59,20 @@ static class AutoReadyPatch
             return;
         }
 
+        var runLobby = GetRunLobby(screen);
+
         const int maxFramesToWait = 600; // ~10s at 60fps.
-        for (var frame = 0; frame < maxFramesToWait; frame++)
+        for (var _ = 0; _ < maxFramesToWait; _++)
         {
-            if (frame % 50 == 0)
-            {
-                Log.Info($"[QUICKRELOAD]: AutoReady waiting for lobby connectivity, frame {frame}.");
-            }
             if (!GodotObject.IsInstanceValid(node) || !GodotObject.IsInstanceValid(confirm))
             {
                 Log.Warn("[QUICKRELOAD]: AutoReady aborted because screen/button became invalid.");
                 return;
             }
 
-            if (AreAllLobbyPlayersConnected(screen))
+            if (AreAllLobbyPlayersConnected(runLobby))
             {
+                QuickReloadState.MarkPendingRunStartupNetGuard();
                 confirm.EmitSignal(NClickableControl.SignalName.Released, confirm);
                 NModalContainer.Instance?.Clear();
                 QuickReloadState.Clear();
@@ -86,15 +87,19 @@ static class AutoReadyPatch
         QuickReloadState.Clear();
     }
 
-    private static bool AreAllLobbyPlayersConnected(object screen)
+    private static bool AreAllLobbyPlayersConnected(LoadRunLobby? runLobby)
     {
         // All three load screens use an internal _runLobby; if unavailable, do not block auto-ready.
-        var runLobby = Traverse.Create(screen).Field<LoadRunLobby>("_runLobby").Value;
         if (runLobby == null)
         {
             return true;
         }
 
         return runLobby.Run.Players.All(player => runLobby.ConnectedPlayerIds.Contains(player.NetId));
+    }
+
+    private static LoadRunLobby? GetRunLobby(object screen)
+    {
+        return Traverse.Create(screen).Field<LoadRunLobby>("_runLobby").Value;
     }
 }

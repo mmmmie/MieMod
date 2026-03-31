@@ -1,9 +1,9 @@
 {
     "id": "QuickReload",
-    "name": "QuickReload",
+    "name": "Quick Reload",
     "author": "mmmmie",
     "description": "Fast run reload from the pause menu, including multiplayer support. F5 hotkey.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "has_pck": true,
     "has_dll": true,
     "dependencies": [],
