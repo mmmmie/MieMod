@@ -16,6 +16,8 @@ public struct QuickReloadMessage :
 
     public LogLevel LogLevel => LogLevel.VeryDebug;
 
+    public bool ShouldBuffer => false;
+
     public void Serialize(PacketWriter writer)
     {
         writer.WriteULong(playerId);

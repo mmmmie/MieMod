@@ -6,7 +6,7 @@ using QuickReload.Multiplayer;
 
 namespace QuickReload;
 
-[HarmonyPatch(typeof(RunManager), nameof(RunManager.InitializeRunLobby))]
+[HarmonyPatch(typeof(RunManager), "InitializeRunLobby")]
 static class QuickReloadNetworkPatch
 {
     static void Postfix(RunManager __instance)

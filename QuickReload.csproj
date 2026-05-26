@@ -10,12 +10,23 @@
         <RootNamespace>QuickReload</RootNamespace>
     </PropertyGroup>
 
+    <!-- Windows -->
+    <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+        <SteamLibraryPath Condition="'$(SteamLibraryPath)' == ''">D:\steam\steamapps</SteamLibraryPath>
+        <GodotPath Condition="'$(GodotPath)' == ''">C:\Program Files\Godot_v4.6.3-stable_mono_win64\Godot_v4.6.3-stable_mono_win64.exe</GodotPath>
+
+        <Sts2Path>E:\SteamLibrary\steamapps\common\Slay the Spire 2</Sts2Path>
+        <ModsPath>$(Sts2Path)\mods\</ModsPath>
+        <Sts2DataDir>$(Sts2Path)\data_sts2_windows_x86_64</Sts2DataDir>
+
+        <SteamworksNetPath Condition="'$(SteamworksNetPath)' == ''">$(Sts2DataDir)\Steamworks.NET.dll</SteamworksNetPath>
+    </PropertyGroup>
+
     <!-- macOS -->
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
         <SteamLibraryPath Condition="'$(SteamLibraryPath)' == ''">$(HOME)/Library/Application Support/Steam/steamapps</SteamLibraryPath>
         <GodotPath Condition="'$(GodotPath)' == ''">/Applications/Godot_mono.app/Contents/MacOS/Godot</GodotPath>
 
-        <!-- The below should not need to be changed. -->
         <Sts2Path>$(SteamLibraryPath)/common/Slay the Spire 2</Sts2Path>
         <ModsPath>$(Sts2Path)/SlayTheSpire2.app/Contents/MacOS/mods/</ModsPath>
         <Sts2DataDir>$(Sts2Path)/SlayTheSpire2.app/Contents/Resources/data_sts2_macos_x86_64</Sts2DataDir>
